@@ -6,18 +6,14 @@ import (
 	"k8s.io/klog"
 )
 
-type CSIDriver struct {
-	Name string
+type IdentityServer struct {
+	Name    string
 	Version string
-}
-
-type IdentityServer struct{
-    CSIDriver
 }
 
 func NewIdentityServer() *IdentityServer {
 	return &IdentityServer{
-		Name: DriverName,
+		Name:    DriverName,
 		Version: Version,
 	}
 }
@@ -42,27 +38,26 @@ func (i *IdentityServer) GetPluginCapabilities(ctx context.Context, req *csi.Get
 			{
 				Type: &csi.PluginCapability_Service_{
 					Service: &csi.PluginCapability_Service{
-						Type: csi.PluginCapability_Service_GROUP_CONTROLLER_SERVICE
+						Type: csi.PluginCapability_Service_GROUP_CONTROLLER_SERVICE,
 					},
 				},
 			},
 			{
 				Type: &csi.PluginCapability_Service_{
 					Service: &csi.PluginCapability_Service{
-						Type: csi.PluginCapability_Service_VOLUME_ACCESSIBILITY_CONSTRAINTS
+						Type: csi.PluginCapability_Service_VOLUME_ACCESSIBILITY_CONSTRAINTS,
 					},
 				},
 			},
 		},
 	}
 
-	return resp,nil
+	return resp, nil
 
 }
 
-
-//插件健康检查
-func (i *IdentityServer) Probe(ctx context.Context,req *csi.ProbeRequest) (*csi.ProbeResponse,error) {
-	klog.V(4).Infof("Probe: called with args %+v",*req)
-	return &csi.ProbeResponse{},nil
+// 插件健康检查
+func (i *IdentityServer) Probe(ctx context.Context, req *csi.ProbeRequest) (*csi.ProbeResponse, error) {
+	klog.V(4).Infof("Probe: called with args %+v", *req)
+	return &csi.ProbeResponse{}, nil
 }
