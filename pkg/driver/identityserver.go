@@ -17,8 +17,8 @@ type IdentityServer struct{
 
 func NewIdentityServer() *IdentityServer {
 	return &IdentityServer{
-		Name: "minio.s3.csi",
-		Version: "v1.0.0",
+		Name: DriverName,
+		Version: Version,
 	}
 }
 
