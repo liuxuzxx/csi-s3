@@ -1,0 +1,120 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: csi-s3-driver
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: csi-s3-driver
+  template:
+    metadata:
+      labels:
+        app: csi-s3-driver
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: h-10-20-121-130-dev-k8s-node
+      serviceAccount: csi-s3-driver-sa
+      containers:
+        #plugin
+        - name: driver
+          image: xwharbor.wxchina.com/cpaas-dev/component/csi-s3:release-v1.0.0
+          args:
+            - --endpoint=$(CSI_ENDPOINT)
+            - --nodeid=$(KUBE_NODE_NAME)
+            - --logtostderr
+            - --v=5
+          env:
+            - name: CSI_ENDPOINT
+              value: unix:///csi/csi.sock
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: kubelet-dir
+              mountPath: /var/lib/kubelet
+              mountPropagation: "Bidirectional"
+            - name: plugin-dir
+              mountPath: /csi
+            - name: device-dir
+              mountPath: /dev
+        #Sidecar:node-driver-registrar
+        - name: node-driver-registrar
+          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/csi-node-driver-registrar:v2.10.0
+          args:
+            - --csi-address=$(ADDRESS)
+            - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
+            - --v=5
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "rm -rf /registration/minio.s3.csi.xw.com-reg.sock /csi/csi.sock"]
+          env:
+            - name: ADDRESS
+              value: /csi/csi.sock
+            - name: DRIVER_REG_SOCK_PATH
+              value: /var/lib/kubelet/plugins/minio.s3.csi.xw.com/csi.sock
+          volumeMounts:
+            - name: plugin-dir
+              mountPath: /csi
+            - name: registration-dir
+              mountPath: /registration
+        #Sidecar: livenessprobe
+        - name: liveness-probe
+          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/livenessprobe:v2.11.0
+          args:
+            - "--csi-address=/csi/csi.sock"
+            - "--v=5"
+          volumeMounts:
+            - name: plugin-dir
+              mountPath: /csi
+        #Sidecar: csi-provisione
+        - name: csi-provisioner
+          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/csi-provisioner:v3.6.0
+          args:
+            - "--csi-address=$(ADDRESS)"
+            - "--v=5"
+            - "--feature-gates=Topology=True"
+          env:
+            - name: ADDRESS
+              value: unix:///csi/csi.sock
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - name: plugin-dir
+              mountPath: /csi
+        #Sidecar: csi-attacher
+        - name: csi-attacher
+          image: xwharbor.wxchina.com/cpaas/k8scsi/csi-attacher:v4.4.0
+          args:
+            - "--v=5"
+            - "--csi-address=$(ADDRESS)"
+          env:
+            - name: ADDRESS
+              value: /csi/csi.sock
+          imagePullPolicy: "Always"
+          volumeMounts:
+            - name: plugin-dir
+              mountPath: /csi
+      volumes:
+        - name: kubelet-dir
+          hostPath:
+            path: /var/lib/kubelet
+            type: Directory
+        - name: plugin-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins/kvm.csi.dianduidian.com/
+            type: DirectoryOrCreate
+        - name: registration-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins_registry/
+            type: Directory
+        - name: device-dir
+          hostPath:
+            path: /dev
+            type: Directory
