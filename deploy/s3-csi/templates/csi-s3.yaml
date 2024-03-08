@@ -65,7 +65,7 @@ spec:
             - name: DRIVER_REG_SOCK_PATH
               value: /var/lib/kubelet/plugins/minio.s3.csi.xw.com/csi.sock
           volumeMounts:
-            - name: socket-dir
+            - name: plugin-dir
               mountPath: /csi
             - name: registration-dir
               mountPath: /registration
