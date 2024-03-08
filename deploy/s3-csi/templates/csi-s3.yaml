@@ -100,7 +100,7 @@ spec:
               value: /csi/csi.sock
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
-            - name: socket-dir
+            - name: plugin-dir
               mountPath: /csi
         #Sidecar: csi-attacher
         - name: csi-attacher
