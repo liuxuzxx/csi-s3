@@ -51,42 +51,56 @@ spec:
             - --csi-address=$(ADDRESS)
             - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
             - --v=5
-          lifecycle:
-            preStop:
-              exec:
-                command: ["/bin/sh", "-c", "rm -rf /registration/minio.s3.csi.xw.com-reg.sock /csi/csi.sock"]
+          livenessProbe:
+            exec:
+              command:
+                - /csi-node-driver-registrar
+                - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
+                - --mode=kubelet-registration-probe
+            initialDelaySeconds: 30
+            timeoutSeconds: 15
           env:
             - name: ADDRESS
               value: /csi/csi.sock
             - name: DRIVER_REG_SOCK_PATH
               value: /var/lib/kubelet/plugins/minio.s3.csi.xw.com/csi.sock
           volumeMounts:
-            - name: plugin-dir
+            - name: socket-dir
               mountPath: /csi
             - name: registration-dir
               mountPath: /registration
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
         #Sidecar: livenessprobe
         - name: liveness-probe
-          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/livenessprobe:v2.11.0
+          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/livenessprobe:v2.12.0
           args:
-            - "--csi-address=/csi/csi.sock"
-            - "--v=5"
+            - --csi-address=/csi/csi.sock
+            - --probe-timeout=3s
+            - --health-port=29643
+            - --v=5
           volumeMounts:
             - name: plugin-dir
               mountPath: /csi
         #Sidecar: csi-provisione
         - name: csi-provisioner
-          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/csi-provisioner:v3.6.0
+          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/csi-provisioner:v4.0.0
           args:
-            - "--csi-address=$(ADDRESS)"
             - "--v=5"
-            - "--feature-gates=Topology=True"
+            - "--csi-address=$(ADDRESS)"
+            - "--leader-election"
+            - "--leader-election-namespace={{ .Release.Namespace }}"
+            - "--extra-create-metadata=true"
           env:
             - name: ADDRESS
-              value: unix:///csi/csi.sock
+              value: /csi/csi.sock
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
-            - name: plugin-dir
+            - name: socket-dir
               mountPath: /csi
         #Sidecar: csi-attacher
         - name: csi-attacher
