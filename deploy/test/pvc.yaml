@@ -7,6 +7,6 @@ spec:
   storageClassName: minio-csi-s3-xw
   resources:
     requests:
-      storage: 20Gi
+      storage: 10Gi
   accessModes:
     - ReadWriteOnce
