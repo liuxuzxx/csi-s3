@@ -47,7 +47,7 @@ func (c *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVolu
 	return &csi.CreateVolumeResponse{
 		Volume: &csi.Volume{
 			VolumeId:      "cpaas-liuxu-20240306182023",
-			CapacityBytes: 20 * (1 << 20),
+			CapacityBytes: 20 * (1 << 30),
 			VolumeContext: req.GetParameters(),
 		},
 	}, nil
