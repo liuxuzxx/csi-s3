@@ -33,26 +33,17 @@ func (i *IdentityServer) GetPluginInfo(ctx context.Context, req *csi.GetPluginIn
 func (i *IdentityServer) GetPluginCapabilities(ctx context.Context, req *csi.GetPluginCapabilitiesRequest) (*csi.GetPluginCapabilitiesResponse, error) {
 	klog.V(4).Infof("GetPluginCapabilities: called with args %+v", *req)
 
-	resp := &csi.GetPluginCapabilitiesResponse{
+	return &csi.GetPluginCapabilitiesResponse{
 		Capabilities: []*csi.PluginCapability{
 			{
 				Type: &csi.PluginCapability_Service_{
 					Service: &csi.PluginCapability_Service{
-						Type: csi.PluginCapability_Service_GROUP_CONTROLLER_SERVICE,
-					},
-				},
-			},
-			{
-				Type: &csi.PluginCapability_Service_{
-					Service: &csi.PluginCapability_Service{
-						Type: csi.PluginCapability_Service_VOLUME_ACCESSIBILITY_CONSTRAINTS,
+						Type: csi.PluginCapability_Service_CONTROLLER_SERVICE,
 					},
 				},
 			},
 		},
-	}
-
-	return resp, nil
+	}, nil
 
 }
 
