@@ -31,7 +31,7 @@ func (i *IdentityServer) GetPluginInfo(ctx context.Context, req *csi.GetPluginIn
 
 // 返回插件支持的功能信息
 func (i *IdentityServer) GetPluginCapabilities(ctx context.Context, req *csi.GetPluginCapabilitiesRequest) (*csi.GetPluginCapabilitiesResponse, error) {
-	klog.V(4).Infof("GetPluginCapabilities: called with args %+v", *req)
+	klog.V(4).Infof("Use CONTROLLER_SERVICE GetPluginCapabilities: called with args %+v", *req)
 
 	return &csi.GetPluginCapabilitiesResponse{
 		Capabilities: []*csi.PluginCapability{

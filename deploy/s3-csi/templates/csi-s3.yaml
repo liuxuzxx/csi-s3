@@ -21,6 +21,7 @@ spec:
         #plugin
         - name: driver
           image: xwharbor.wxchina.com/cpaas-dev/component/csi-s3:release-v1.0.0
+          imagePullPolicy: Always
           args:
             - --endpoint=$(CSI_ENDPOINT)
             - --nodeId=$(KUBE_NODE_NAME)
