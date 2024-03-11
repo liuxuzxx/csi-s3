@@ -20,7 +20,7 @@ spec:
       containers:
         #plugin
         - name: driver
-          image: xwharbor.wxchina.com/cpaas-dev/component/csi-s3:release-v1.0.0
+          image: {{ .Values.global.image }}:{{ .Values.global.tag }}
           imagePullPolicy: Always
           args:
             - --endpoint=$(CSI_ENDPOINT)
