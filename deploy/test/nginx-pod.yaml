@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-name
+  labels:
+    name: my-name
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: h-10-20-121-130-dev-k8s-node
+      containers:
+        - image: xwharbor.wxchina.com/cpaas-pub/nginx:1.24.0
+          name: nginx
+          resources:
+            requests:
+              cpu: 20m
+              memory: 30Mi
+            limits:
+              cpu: 100m
+              memory: 50Mi
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: test-s3-minio
