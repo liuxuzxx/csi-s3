@@ -2,10 +2,14 @@ package driver
 
 import (
 	"github.com/container-storage-interface/spec/lib/go/csi"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"k8s.io/klog"
 )
 
+// 经过比对以及真实的验证，发现这个IdentityServer这个interface实现的没有任何问题，很正确
 type IdentityServer struct {
 	Name    string
 	Version string
@@ -22,6 +26,13 @@ func NewIdentityServer() *IdentityServer {
 func (i *IdentityServer) GetPluginInfo(ctx context.Context, req *csi.GetPluginInfoRequest) (*csi.GetPluginInfoResponse, error) {
 
 	klog.V(4).Infof("GetPluginInfo: called with args %+v", *req)
+	if i.Name == "" {
+		return nil, status.Error(codes.Unavailable, "Driver name not configured,can not be null or empty")
+	}
+
+	if i.Version == "" {
+		return nil, status.Error(codes.Unavailable, "Driver mis missing version")
+	}
 
 	return &csi.GetPluginInfoResponse{
 		Name:          i.Name,
@@ -49,6 +60,6 @@ func (i *IdentityServer) GetPluginCapabilities(ctx context.Context, req *csi.Get
 
 // 插件健康检查
 func (i *IdentityServer) Probe(ctx context.Context, req *csi.ProbeRequest) (*csi.ProbeResponse, error) {
-	klog.V(4).Infof("Probe: called with args %+v", *req)
-	return &csi.ProbeResponse{}, nil
+	klog.V(4).Infof("IdentityServer Probe: called with args %+v", *req)
+	return &csi.ProbeResponse{Ready: &wrappers.BoolValue{Value: true}}, nil
 }

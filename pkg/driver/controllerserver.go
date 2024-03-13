@@ -1,7 +1,13 @@
 package driver
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
+	"io"
+	"strings"
+
 	"github.com/container-storage-interface/spec/lib/go/csi"
+	"github.com/liuxuzxx/csi-s3/pkg/s3"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,11 +49,21 @@ func (c *ControllerServer) ControllerGetCapabilities(ctx context.Context, req *c
 // 创建Volume
 func (c *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVolumeRequest) (*csi.CreateVolumeResponse, error) {
 	klog.V(4).Infof("CreateVolume: called with args %+v", *req)
+	name := req.GetName()
+	if len(name) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "CreateVolume name must be provided")
+	}
+	capacityBytes := int64(req.GetCapacityRange().GetRequiredBytes())
+	volumeId := generateVolumeId(name)
+	path := volumeId
+	client := s3.NewMinioClient("cpaas-minio.minio:9000", "admin", "minioadmin")
+
+	client.CreateDir(path)
 
 	return &csi.CreateVolumeResponse{
 		Volume: &csi.Volume{
-			VolumeId:      "cpaas-liuxu-20240306182023",
-			CapacityBytes: 20 * (1 << 30),
+			VolumeId:      volumeId,
+			CapacityBytes: capacityBytes,
 			VolumeContext: req.GetParameters(),
 		},
 	}, nil
@@ -72,9 +88,17 @@ func (cs *ControllerServer) ControllerUnpublishVolume(ctx context.Context, req *
 	return &csi.ControllerUnpublishVolumeResponse{}, nil
 }
 
-// TODO(xnile): implement this
 func (cs *ControllerServer) ValidateVolumeCapabilities(ctx context.Context, req *csi.ValidateVolumeCapabilitiesRequest) (*csi.ValidateVolumeCapabilitiesResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "")
+	if len(req.GetVolumeId()) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "Volume ID missing in request")
+	}
+
+	return &csi.ValidateVolumeCapabilitiesResponse{
+		Confirmed: &csi.ValidateVolumeCapabilitiesResponse_Confirmed{
+			VolumeCapabilities: req.GetVolumeCapabilities(),
+		},
+		Message: "",
+	}, nil
 }
 
 func (cs *ControllerServer) ListVolumes(ctx context.Context, req *csi.ListVolumesRequest) (*csi.ListVolumesResponse, error) {
@@ -107,4 +131,15 @@ func (cs *ControllerServer) ControllerGetVolume(ctx context.Context, req *csi.Co
 
 func (cs *ControllerServer) ControllerModifyVolume(ctx context.Context, req *csi.ControllerModifyVolumeRequest) (*csi.ControllerModifyVolumeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "")
+}
+
+// 实现volumeId的字段生成
+func generateVolumeId(source string) string {
+	source = strings.ToLower(source)
+	if len(source) > 63 {
+		h := sha1.New()
+		io.WriteString(h, source)
+		source = hex.EncodeToString(h.Sum(nil))
+	}
+	return source
 }

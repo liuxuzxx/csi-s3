@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: csi-s3-daemonset
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: csi-s3-daemonset
+  template:
+    metadata:
+      labels:
+        app: csi-s3-daemonset
+    spec:
+      serviceAccountName: csi-s3-driver-sa
+      priorityClassName: system-node-critical
+      tolerations:
+        - operator: Exists
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: s3-plugin
+          image: {{ .Values.global.image }}:{{ .Values.global.tag }}
+          args:
+            - --endpoint=$(CSI_ENDPOINT)
+            - --nodeId=$(NODE_NAME)
+            - --v=5
+          env:
+            - name: CSI_ENDPOINT
+              value: unix:///csi/csi.sock
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: pod-mount-dir
+              mountPath: /var/lib/kubelet/pods
+              mountPropagation: Bidirectional
+            - mountPath: /csi
+              name: socket-dir
+        - name: node-driver-registrar
+          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/csi-node-driver-registrar:v2.10.0
+          args:
+            - --csi-address=$(ADDRESS)
+            - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
+            - --v=5
+          env:
+            - name: ADDRESS
+              value: /csi/csi.sock
+            - name: DRIVER_REG_SOCK_PATH
+              value: /var/lib/kubelet/plugins/minio.s3.csi.xw.com/csi.sock
+          volumeMounts:
+            - mountPath: /csi
+              name: socket-dir
+            - mountPath: /registration
+              name: registration-dir
+        - name: liveness-probe
+          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/livenessprobe:v2.12.0
+          args:
+            - --csi-address=/csi/csi.sock
+            - --health-port=29653
+            - --probe-timeout=3s
+            - --v=5
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
+          volumeMounts:
+            - mountPath: /csi
+              name: socket-dir
+      volumes:
+        - name: socket-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins/minio.s3.csi.xw.com/
+            type: DirectoryOrCreate
+        - name: pod-mount-dir
+          hostPath:
+            path: /var/lib/kubelet/pods
+            type: Directory
+        - name: registration-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins_registry
+            type: Directory
