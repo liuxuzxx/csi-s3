@@ -9,6 +9,7 @@ import (
 	"k8s.io/klog"
 )
 
+// 经过比对以及真实的验证，发现这个IdentityServer这个interface实现的没有任何问题，很正确
 type IdentityServer struct {
 	Name    string
 	Version string
