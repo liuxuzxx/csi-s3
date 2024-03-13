@@ -36,7 +36,7 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
-            - name: pod-mout-dir
+            - name: pod-mount-dir
               mountPath: /var/lib/kubelet/pods
               mountPropagation: Bidirectional
             - mountPath: /csi
@@ -51,7 +51,7 @@ spec:
             - name: ADDRESS
               value: /csi/csi.sock
             - name: DRIVER_REG_SOCK_PATH
-              value: /var/lib/kubelet/csi-plugins/minio.s3.csi.xw.com/csi.sock
+              value: /var/lib/kubelet/plugins/minio.s3.csi.xw.com/csi.sock
           volumeMounts:
             - mountPath: /csi
               name: socket-dir
