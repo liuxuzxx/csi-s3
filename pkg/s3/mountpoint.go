@@ -40,7 +40,7 @@ func (m *MountpointS3) Mount(source string, target string) error {
 	args := []string{
 		"--endpoint-url=" + url,
 		m.bucket,
-		"--prefix=" + source,
+		"--prefix=" + source + "/",
 		target,
 	}
 
