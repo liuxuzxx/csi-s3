@@ -121,6 +121,7 @@ func (ns *NodeServer) NodeExpandVolume(ctx context.Context, req *csi.NodeExpandV
 	return nil, status.Error(codes.Unimplemented, "")
 }
 
+// TODO 看到Pod里面其实没有创建/var/lib/kubelet/pods/d51de966-1a5f-4d35-843a-56b5e4cf6ed2/volumes/kubernetes.io~csi/pvc-967ee658-01ec-445c-ac7f-6fb058e22c7b/mount 后面这个路径，问题出现在这个地方
 func checkMount(path string) (bool, error) {
 	notMnt, err := mount.New("").IsLikelyNotMountPoint(path)
 	if err != nil {
