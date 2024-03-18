@@ -22,29 +22,10 @@ func NewNodeServer(nodeId string) *NodeServer {
 	}
 }
 
-// 格式化磁盘 Mount到全局目录
+// 看到有些实现CSI的插件，NodeStageVolume方法并没有什么动作，有些甚至直接返回了Unimplement
 func (n *NodeServer) NodeStageVolume(ctx context.Context, req *csi.NodeStageVolumeRequest) (*csi.NodeStageVolumeResponse, error) {
 	klog.V(4).Infof("NodeStageVolume: called with args %+v", *req)
-
-	volumeId := req.GetVolumeId()
-	path := req.GetStagingTargetPath()
-	if len(volumeId) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "Volume Id missing in request")
-	}
-
-	if len(path) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "Target path missing in request")
-	}
-	notMnt, err := checkMount(path)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-	//如果是已经挂载了，那么直接返回响应即可
-	if !notMnt {
-		return &csi.NodeStageVolumeResponse{}, nil
-	}
-
-	return &csi.NodeStageVolumeResponse{}, nil
+	return nil, status.Error(codes.Unimplemented, "")
 }
 
 func (n *NodeServer) NodeUnstageVolume(ctx context.Context, req *csi.NodeUnstageVolumeRequest) (*csi.NodeUnstageVolumeResponse, error) {
@@ -123,16 +104,23 @@ func (ns *NodeServer) NodeExpandVolume(ctx context.Context, req *csi.NodeExpandV
 
 // TODO 看到Pod里面其实没有创建/var/lib/kubelet/pods/d51de966-1a5f-4d35-843a-56b5e4cf6ed2/volumes/kubernetes.io~csi/pvc-967ee658-01ec-445c-ac7f-6fb058e22c7b/mount 后面这个路径，问题出现在这个地方
 func checkMount(path string) (bool, error) {
+	err := mkDirAll(path)
+	if err != nil {
+		return false, err
+	}
 	notMnt, err := mount.New("").IsLikelyNotMountPoint(path)
 	if err != nil {
-		if os.IsNotExist(err) {
-			if err = os.MkdirAll(path, 0750); err != nil {
-				return false, err
-			}
-			notMnt = true
-		} else {
-			return false, err
-		}
+		return false, err
 	}
 	return notMnt, nil
+}
+
+func mkDirAll(path string) error {
+	err := os.MkdirAll(path, os.FileMode(0755))
+	if err != nil {
+		if !os.IsExist(err) {
+			return err
+		}
+	}
+	return nil
 }
