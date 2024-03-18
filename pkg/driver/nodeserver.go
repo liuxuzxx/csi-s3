@@ -25,7 +25,7 @@ func NewNodeServer(nodeId string) *NodeServer {
 // 看到有些实现CSI的插件，NodeStageVolume方法并没有什么动作，有些甚至直接返回了Unimplement
 func (n *NodeServer) NodeStageVolume(ctx context.Context, req *csi.NodeStageVolumeRequest) (*csi.NodeStageVolumeResponse, error) {
 	klog.V(4).Infof("NodeStageVolume: called with args %+v", *req)
-	return nil, status.Error(codes.Unimplemented, "")
+	return &csi.NodeStageVolumeResponse{}, nil
 }
 
 func (n *NodeServer) NodeUnstageVolume(ctx context.Context, req *csi.NodeUnstageVolumeRequest) (*csi.NodeUnstageVolumeResponse, error) {
