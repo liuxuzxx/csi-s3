@@ -56,7 +56,8 @@ func (c *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVolu
 	capacityBytes := int64(req.GetCapacityRange().GetRequiredBytes())
 	volumeId := generateVolumeId(name)
 	path := volumeId
-	client := s3.NewMinioClient("cpaas-minio.minio:9000", "admin", "minioadmin")
+
+	client := s3.NewClient(req)
 
 	client.CreateDir(path)
 

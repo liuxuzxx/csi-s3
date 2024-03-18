@@ -4,9 +4,17 @@ import (
 	"bytes"
 	"context"
 
+	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"k8s.io/klog"
+)
+
+const (
+	Bucket    string = "bucket"
+	AccessKey string = "access-key"
+	SecretKey string = "secret-key"
+	Endpoint  string = "endpoint"
 )
 
 // 增加Minio的操作封装对象，方便处理一些操作
@@ -20,7 +28,18 @@ type MinioClient struct {
 	ctx             context.Context
 }
 
-func NewMinioClient(endpoint string, accessKey string, secretAccessKey string) *MinioClient {
+func NewClient(req *csi.CreateVolumeRequest) *MinioClient {
+	p := req.GetParameters()
+
+	ak := p[AccessKey]
+	sk := p[SecretKey]
+	ep := p[Endpoint]
+	bk := p[Bucket]
+	klog.V(4).Infof("Fetch s3 config:%s %s %s %s", ak, sk, ep, bk)
+	return NewMinioClient(ep, ak, sk, bk)
+}
+
+func NewMinioClient(endpoint string, accessKey string, secretAccessKey string, bucket string) *MinioClient {
 
 	client, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretAccessKey, ""),
@@ -35,7 +54,7 @@ func NewMinioClient(endpoint string, accessKey string, secretAccessKey string) *
 		secretAccessKey: secretAccessKey,
 		useSSL:          false,
 		client:          client,
-		bucketName:      "k8s-dev-sc",
+		bucketName:      bucket,
 		ctx:             context.Background(),
 	}
 }
