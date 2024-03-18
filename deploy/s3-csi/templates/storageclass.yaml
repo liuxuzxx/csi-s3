@@ -6,6 +6,6 @@ provisioner: minio.s3.csi.xw.com
 parameters:
   mounter: mount-s3
   bucket: k8s-dev-sc
-  access-key: minio
+  access-key: admin
   secret-key: minioadmin
   endpoint: 10.20.121.41:30629

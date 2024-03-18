@@ -117,7 +117,7 @@ func checkMount(path string) (bool, error) {
 }
 
 func mkDirAll(path string) error {
-	klog.V(4).Infof("Create Pod mount path:{}", path)
+	klog.V(4).Infof("Create Pod mount path:%s", path)
 	err := os.MkdirAll(path, os.FileMode(0755))
 	if err != nil {
 		if !os.IsExist(err) {
