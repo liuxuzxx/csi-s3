@@ -15,6 +15,10 @@ const (
 	AccessKey string = "access-key"
 	SecretKey string = "secret-key"
 	Endpoint  string = "endpoint"
+	Version   string = `S3-Service: Minio
+						CSI: K8S
+						Company: Xuanwu Technolojy
+	`
 )
 
 // 增加Minio的操作封装对象，方便处理一些操作
@@ -61,7 +65,9 @@ func NewMinioClient(endpoint string, accessKey string, secretAccessKey string, b
 
 // 处理创建文件夹相关的动作
 func (m *MinioClient) CreateDir(path string) error {
-	_, err := m.client.PutObject(m.ctx, m.bucketName, path+"/", bytes.NewReader([]byte("")), 0, minio.PutObjectOptions{})
+	p := path + "/" + path + ".version"
+	b := []byte(Version)
+	_, err := m.client.PutObject(m.ctx, m.bucketName, p, bytes.NewReader(b), int64(len(b)), minio.PutObjectOptions{})
 	if err != nil {
 		return err
 	}

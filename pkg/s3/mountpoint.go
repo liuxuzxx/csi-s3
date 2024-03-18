@@ -2,9 +2,10 @@ package s3
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
+	"strings"
 
+	"github.com/container-storage-interface/spec/lib/go/csi"
 	"k8s.io/klog"
 )
 
@@ -16,13 +17,24 @@ const (
 // https://github.com/awslabs/mountpoint-s3  git地址
 
 type MountpointS3 struct {
-	bucket string
+	bucket   string
+	endpoint string
 }
 
-func NewMountpointS3(bucket string) *MountpointS3 {
+func NewMountpointS3(req *csi.NodePublishVolumeRequest) *MountpointS3 {
+	param := req.GetVolumeContext()
 	return &MountpointS3{
-		bucket: bucket,
+		bucket:   param[Bucket],
+		endpoint: param[Endpoint],
 	}
+}
+
+func (m *MountpointS3) endpointUrl() string {
+	if strings.HasPrefix(m.endpoint, "http://") || strings.HasPrefix(m.endpoint, "https://") {
+		return m.endpoint
+	}
+	return "http://" + m.endpoint
+
 }
 
 func (m *MountpointS3) Stage(path string) error {
@@ -36,7 +48,7 @@ func (m *MountpointS3) Unstage(path string) error {
 }
 
 func (m *MountpointS3) Mount(source string, target string) error {
-	url := os.Getenv("ENDPOINT_URL")
+	url := m.endpointUrl()
 	args := []string{
 		"--endpoint-url=" + url,
 		m.bucket,

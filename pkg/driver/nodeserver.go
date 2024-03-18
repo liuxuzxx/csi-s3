@@ -54,7 +54,8 @@ func (ns *NodeServer) NodePublishVolume(ctx context.Context, req *csi.NodePublis
 	if !notMnt {
 		return &csi.NodePublishVolumeResponse{}, nil
 	}
-	mnt := s3.NewMountpointS3("k8s-dev-sc")
+
+	mnt := s3.NewMountpointS3(req)
 	err = mnt.Mount(volumeId, target)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

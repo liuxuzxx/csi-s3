@@ -25,12 +25,6 @@ spec:
             - --nodeId=$(NODE_NAME)
             - --v=5
           env:
-            - name: AWS_ACCESS_KEY_ID
-              value: {{ .Values.minio.accessKey }}
-            - name: AWS_SECRET_ACCESS_KEY
-              value: {{ .Values.minio.accessSecret }}
-            - name: ENDPOINT_URL
-              value: {{ .Values.minio.url }}
             - name: CSI_ENDPOINT
               value: unix:///csi/csi.sock
             - name: NODE_NAME
