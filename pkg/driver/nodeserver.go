@@ -1,11 +1,15 @@
 package driver
 
 import (
+	"os"
+
 	"github.com/container-storage-interface/spec/lib/go/csi"
+	"github.com/liuxuzxx/csi-s3/pkg/s3"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/klog"
+	"k8s.io/mount-utils"
 )
 
 type NodeServer struct {
@@ -18,9 +22,8 @@ func NewNodeServer(nodeId string) *NodeServer {
 	}
 }
 
-// 格式化磁盘 Mount到全局目录
+// 看到有些实现CSI的插件，NodeStageVolume方法并没有什么动作，有些甚至直接返回了Unimplement
 func (n *NodeServer) NodeStageVolume(ctx context.Context, req *csi.NodeStageVolumeRequest) (*csi.NodeStageVolumeResponse, error) {
-
 	klog.V(4).Infof("NodeStageVolume: called with args %+v", *req)
 	return &csi.NodeStageVolumeResponse{}, nil
 }
@@ -30,10 +33,32 @@ func (n *NodeServer) NodeUnstageVolume(ctx context.Context, req *csi.NodeUnstage
 	return &csi.NodeUnstageVolumeResponse{}, nil
 }
 
+// 首先调用的是NodeStageVolume方法，执行了一些操作之后，才会接着调用NodePushlishVolume方法
 // NodePublishVolume 从全局目录mount到目标目录(后续将映射到Pod中)
 func (ns *NodeServer) NodePublishVolume(ctx context.Context, req *csi.NodePublishVolumeRequest) (*csi.NodePublishVolumeResponse, error) {
 	klog.V(4).Infof("NodePublishVolume: called with args %+v", *req)
+	volumeId := req.GetVolumeId()
+	if len(volumeId) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "Volume Id not provided")
+	}
+	target := req.GetTargetPath()
+	if len(target) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "Target path not provided")
+	}
 
+	notMnt, err := checkMount(target)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if !notMnt {
+		return &csi.NodePublishVolumeResponse{}, nil
+	}
+	mnt := s3.NewMountpointS3("k8s-dev-sc")
+	err = mnt.Mount(volumeId, target)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 	return &csi.NodePublishVolumeResponse{}, nil
 }
 
@@ -75,4 +100,28 @@ func (ns *NodeServer) NodeGetVolumeStats(ctx context.Context, in *csi.NodeGetVol
 
 func (ns *NodeServer) NodeExpandVolume(ctx context.Context, req *csi.NodeExpandVolumeRequest) (*csi.NodeExpandVolumeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "")
+}
+
+// TODO 看到Pod里面其实没有创建/var/lib/kubelet/pods/d51de966-1a5f-4d35-843a-56b5e4cf6ed2/volumes/kubernetes.io~csi/pvc-967ee658-01ec-445c-ac7f-6fb058e22c7b/mount 后面这个路径，问题出现在这个地方
+func checkMount(path string) (bool, error) {
+	err := mkDirAll(path)
+	if err != nil {
+		return false, err
+	}
+	notMnt, err := mount.New("").IsLikelyNotMountPoint(path)
+	if err != nil {
+		return false, err
+	}
+	return notMnt, nil
+}
+
+func mkDirAll(path string) error {
+	klog.V(4).Infof("Create Pod mount path:{}", path)
+	err := os.MkdirAll(path, os.FileMode(0755))
+	if err != nil {
+		if !os.IsExist(err) {
+			return err
+		}
+	}
+	return nil
 }
