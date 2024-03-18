@@ -3,3 +3,9 @@ kind: StorageClass
 metadata:
   name: minio-csi-s3-xw
 provisioner: minio.s3.csi.xw.com
+parameters:
+  mounter: mount-s3
+  bucket: k8s-dev-sc
+  csi.storage.k8s.io/access-key: minio
+  csi.storage.k8s.io/secret-key: minioadmin
+  csi.storage.k8s.io/endpoint: http://10.20.121.41:30629
