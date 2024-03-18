@@ -8,4 +8,4 @@ parameters:
   bucket: k8s-dev-sc
   access-key: minio
   secret-key: minioadmin
-  endpoint: http://10.20.121.41:30629
+  endpoint: 10.20.121.41:30629
