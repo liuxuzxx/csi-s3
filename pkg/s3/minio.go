@@ -65,9 +65,9 @@ func NewMinioClient(endpoint string, accessKey string, secretAccessKey string, b
 
 // 处理创建文件夹相关的动作
 func (m *MinioClient) CreateDir(path string) error {
-	//_, err := m.client.PutObject(m.ctx, m.bucketName, path+"/", bytes.NewReader([]byte("")), 0, minio.PutObjectOptions{})
-	b := []byte(Version)
-	_, err := m.client.PutObject(context.Background(), m.bucketName, path, bytes.NewReader(b), int64(len(b)), minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err := m.client.PutObject(m.ctx, m.bucketName, path+"/", bytes.NewReader([]byte("")), 0, minio.PutObjectOptions{})
+	//b := []byte(Version)
+	//_, err := m.client.PutObject(context.Background(), m.bucketName, path, bytes.NewReader(b), int64(len(b)), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return err
 	}
