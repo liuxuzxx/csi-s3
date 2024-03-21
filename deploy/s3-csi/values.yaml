@@ -1,6 +1,6 @@
 global:
   image: xwharbor.wxchina.com/cpaas-dev/component/csi-s3
-  tag: release-v0.0.0.13
+  tag: release-v0.0.0.14
 
 minio:
   url: http://10.20.121.41:30629

@@ -11,13 +11,16 @@ import (
 )
 
 const (
-	mountS3Command     = "mount-s3"
-	AwsAccessKeyId     = "AWS_ACCESS_KEY_ID"
-	AwsSecretAccessKey = "AWS_SECRET_ACCESS_KEY"
+	mountS3Command = "mount-s3"
 )
 
 // 采用Aws开发的一个mountpoint-s3的挂载服务，因为是采用Rust编写的，所以感觉要比golang编写的rclone要性能高
-// https://github.com/awslabs/mountpoint-s3  git地址
+// git地址:https://github.com/awslabs/mountpoint-s3
+//但是有个问题，就是如下官方网站说的:
+//but probably not the right fit for applications that:
+
+//use file operations that S3 doesn't natively support, like directory renaming or symlinks
+//make edits to existing files (don't work on your Git repository or run vim in Mountpoint 😄)
 
 type MountpointS3 struct {
 	bucket    string
@@ -41,7 +44,6 @@ func (m *MountpointS3) endpointUrl() string {
 		return m.endpoint
 	}
 	return "http://" + m.endpoint
-
 }
 
 func (m *MountpointS3) Stage(path string) error {

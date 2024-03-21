@@ -1,5 +1,10 @@
 package s3
 
+const (
+	AwsAccessKeyId     = "AWS_ACCESS_KEY_ID"
+	AwsSecretAccessKey = "AWS_SECRET_ACCESS_KEY"
+)
+
 // 定义Mounter接口，定义好对接S3的挂载的接口
 type Mounter interface {
 	//执行Stage的操作
