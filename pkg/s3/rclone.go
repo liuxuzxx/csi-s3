@@ -63,8 +63,8 @@ func (r *Rclone) Mount(source string, target string) error {
 	cmd := exec.Command(rcloneCommand, args...)
 	klog.V(4).Infof("Rclone with command:%s and args:%s", rcloneCommand, args)
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("error execute rclone mount command:%s args:%s", rcloneCommand, args)
+	if out, err := cmd.Output(); err != nil {
+		return fmt.Errorf("error execute rclone mount command:%s args:%s output:%s", rcloneCommand, args, out)
 	}
 	return nil
 }
