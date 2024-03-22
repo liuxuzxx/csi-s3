@@ -48,19 +48,19 @@ func (r *Rclone) Mount(source string, target string) error {
 
 	args := []string{
 		"mount",
-		"minio:/" + r.bucket,
+		"minio:/" + r.bucket + "/" + source,
 		target,
 		"--config=/home/csi/rclone.conf",
 		"--s3-endpoint=" + url,
-		"--attr-timeout 5m",
-		"--vfs-cache-mode full",
-		"--vfs-cache-max-age 24h",
-		"--vfs-cache-max-size 10G",
-		"--vfs-read-chunk-size-limit 100M",
-		"--buffer-size 100M",
-		"--daemon",
+		"--attr-timeout=5m",
+		"--vfs-cache-mode=full",
+		"--vfs-cache-max-age=24h",
+		"--vfs-cache-max-size=10G",
+		"--vfs-read-chunk-size-limit=100M",
+		"--buffer-size=100M",
 	}
 	cmd := exec.Command(rcloneCommand, args...)
+	cmd.Stderr = os.Stderr
 	klog.V(4).Infof("Rclone with command:%s and args:%s", rcloneCommand, args)
 
 	if out, err := cmd.Output(); err != nil {
