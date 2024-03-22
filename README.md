@@ -11,3 +11,16 @@ https://github.com/ctrox/csi-s3.git
 # CSI的流程
 1.当我们执行PVC的创建的时候，K8S会调用CSI插件(使用driver的名字来区分)的Controller服务的CreateVolume接口，创建Volume(这个时候只是创建了一个Volume对象，然后记录给了K8S).  Volume的创建
 2.Volume的使用:当我们使用一个Pod当中的某个容器执行volumeMounts的时候，会调用CSI插件的ControllerPublishVolume接口，将这个存储见挂载到某个主机上
+
+# 打包流程
+1. git clone 仓库的git地址
+2. 打包并且构建镜像并推送
+```bash
+cd ./cmd/s3csi
+bash build.sh
+```
+3.执行安装
+```bash
+cd ./deploy/s3-csi
+helm install csi-s3 ./ -n namespace(自定义)
+```
