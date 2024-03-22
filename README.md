@@ -17,7 +17,7 @@ https://github.com/ctrox/csi-s3.git
 2. 打包并且构建镜像并推送
 ```bash
 cd ./cmd/s3csi
-bash build.sh
+bash build-nopush.sh
 ```
 3.执行安装
 ```bash
