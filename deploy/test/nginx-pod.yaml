@@ -14,8 +14,6 @@ spec:
       labels:
         app: nginx
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: h-10-20-121-130-dev-k8s-node
       containers:
         - image: xwharbor.wxchina.com/cpaas-pub/nginx:1.24.0
           name: nginx

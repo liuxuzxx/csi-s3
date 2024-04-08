@@ -5,7 +5,7 @@ metadata:
 provisioner: minio.s3.csi.xw.com
 parameters:
   mounter: mount-s3
-  bucket: k8s-dev-sc
-  access-key: admin
-  secret-key: minioadmin
-  endpoint: 10.20.121.41:30629
+  bucket: {{ .Values.minio.bucket }}
+  access-key: {{ .Values.minio.accessKey }}
+  secret-key: {{ .Values.minio.accessSecret }}
+  endpoint: {{ .Values.minio.url }}

@@ -57,8 +57,6 @@ func (m *MountpointS3) Unstage(path string) error {
 }
 
 func (m *MountpointS3) Mount(source string, target string) error {
-	os.Setenv(AwsAccessKeyId, m.accessKey)
-	os.Setenv(AwsSecretAccessKey, m.secretKey)
 	url := m.endpointUrl()
 	args := []string{
 		"--endpoint-url=" + url,
@@ -69,6 +67,12 @@ func (m *MountpointS3) Mount(source string, target string) error {
 	}
 
 	cmd := exec.Command(mountS3Command, args...)
+	envs := []string{
+		"AWS_ACCESS_KEY_ID=" + m.accessKey,
+		"AWS_SECRET_ACCESS_KEY=" + m.secretKey,
+	}
+	cmd.Stderr = os.Stderr
+	cmd.Env = append(cmd.Environ(), envs...)
 	klog.V(4).Infof("Mount fuse with command:%s and args:%s", mountS3Command, args)
 
 	if err := cmd.Run(); err != nil {

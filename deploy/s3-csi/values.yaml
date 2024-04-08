@@ -1,8 +1,9 @@
 global:
   image: xwharbor.wxchina.com/cpaas-dev/component/csi-s3
-  tag: release-v0.0.0.22
+  tag: v1.1.0
 
 minio:
-  url: http://10.20.121.41:30629
+  url: 10.20.121.41:30629
   accessKey: admin
   accessSecret: minioadmin
+  bucket: k8s-dev-sc

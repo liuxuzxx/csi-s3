@@ -42,8 +42,6 @@ func (r *Rclone) Unstage(path string) error {
 }
 
 func (r *Rclone) Mount(source string, target string) error {
-	os.Setenv(AwsAccessKeyId, r.accessKey)
-	os.Setenv(AwsSecretAccessKey, r.secretKey)
 	url := r.endpointUrl()
 
 	args := []string{
@@ -58,9 +56,15 @@ func (r *Rclone) Mount(source string, target string) error {
 		"--vfs-cache-max-size=10G",
 		"--vfs-read-chunk-size-limit=100M",
 		"--buffer-size=100M",
+		"--daemon",
+	}
+	envs := []string{
+		"AWS_ACCESS_KEY_ID=" + r.accessKey,
+		"AWS_SECRET_ACCESS_KEY=" + r.secretKey,
 	}
 	cmd := exec.Command(rcloneCommand, args...)
 	cmd.Stderr = os.Stderr
+	cmd.Env = append(cmd.Environ(), envs...)
 	klog.V(4).Infof("Rclone with command:%s and args:%s", rcloneCommand, args)
 
 	if out, err := cmd.Output(); err != nil {
