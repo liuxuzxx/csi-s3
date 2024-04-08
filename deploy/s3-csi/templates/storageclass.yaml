@@ -4,7 +4,8 @@ metadata:
   name: minio-csi-s3-xw
 provisioner: minio.s3.csi.xw.com
 parameters:
-  mounter: mount-s3
+  #目前支持两种类型: rclone,mountpoint-s3
+  mounter: rclone
   bucket: {{ .Values.minio.bucket }}
   access-key: {{ .Values.minio.accessKey }}
   secret-key: {{ .Values.minio.accessSecret }}

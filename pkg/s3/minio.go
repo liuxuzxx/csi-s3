@@ -11,11 +11,12 @@ import (
 )
 
 const (
-	Bucket    string = "bucket"
-	AccessKey string = "access-key"
-	SecretKey string = "secret-key"
-	Endpoint  string = "endpoint"
-	Version   string = `S3-Service: Minio
+	MounterType string = "mounter"
+	Bucket      string = "bucket"
+	AccessKey   string = "access-key"
+	SecretKey   string = "secret-key"
+	Endpoint    string = "endpoint"
+	Version     string = `S3-Service: Minio
 						CSI: K8S
 						Company: Xuanwu Technolojy
 	`
