@@ -56,6 +56,7 @@ func (r *Rclone) Mount(source string, target string) error {
 		"--vfs-cache-max-size=10G",
 		"--vfs-read-chunk-size-limit=100M",
 		"--buffer-size=100M",
+		"--file-perms 0777",
 		"--daemon",
 	}
 	envs := []string{
