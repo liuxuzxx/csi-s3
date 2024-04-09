@@ -2,7 +2,6 @@ package s3
 
 import (
 	"github.com/container-storage-interface/spec/lib/go/csi"
-	"github.com/liuxuzxx/csi-s3/pkg/s3"
 )
 
 const (
@@ -32,10 +31,10 @@ func NewMounter(req *csi.NodePublishVolumeRequest) Mounter {
 	mounter := param[MounterType]
 	switch mounter {
 	case RcloneMounter:
-		return s3.NewRclone(req)
+		return NewRclone(req)
 	case MountpointS3Mounter:
-		return s3.NewMountpointS3(req)
+		return NewMountpointS3(req)
 	default:
-		return s3.NewRclone(req)
+		return NewRclone(req)
 	}
 }
