@@ -1,3 +1,63 @@
+# S3 CSI Driver (Minio/Huawei cloud OBS/Amazon S3)
+
+## Overview
+The Mountpoint for S3 Container Storage Interface (CSI) Driver allows your Kubernetes applications to access S3 objects through a file system interface.
+
+## Fatures
+* **Static Provisioning** - Associate an existing S3 bucket with a [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) (PV) for consumption within Kubernetes.
+* **Mount Options** - Mount options can be specified in the PersistentVolume (PV) resource to define how the volume should be mounted. For Mountpoint-specific options
+
+## Support S3 Server
+
+|S3 Server Type|Supported|Remark|
+|:--:|:--:|:--:|
+|MinIO|Yes|No|
+|Huawei Cloud OBS|Yes|No|
+|Amazon S3|Yes|No|
+
+## Support Mounter type
+
+* **rclone** -  [Rclone Github Link](https://github.com/rclone/rclone.git)
+* **mountpoint-s3** [mountpoint-s3 Github Link](https://github.com/awslabs/mountpoint-s3-csi-driver.git)
+
+## Container Images
+| Driver Version | Image(Docker hub)|
+|----------------|------------------|
+| v1.2.0         | liuxuzxx/csi-s3:v1.2.0|
+
+<summary>Previous Images</summary>
+
+| Driver Version | Image(Docker hub) |
+|----------------|-------------------|
+| v1.1.0         | liuxuzxx/csi/s3:v1.1.0|
+
+## Install
+
+We support install use Helm
+
+1. [Install Helm](https://helm.sh/docs/intro/install/)
+2. Install csi-s3
+```bash
+linux> git clone https://github.com/liuxuzxx/csi-s3.git
+linux> cd csi-s3/deploy/s3-csi
+linux> helm install csi-s3 ./ -n xxx
+```
+
+
+## Self Build
+
+```bash
+linux> git clone https://github.com/liuxuzxx/csi-s3.git
+linux> cd csi-s3/cmd/s3csi
+
+#build image
+linux> bash build-nopush.sh
+
+#go build
+linux> go build
+```
+
+
 # 概述
 支持S3协议的K8S的CSI插件实现
 

@@ -55,7 +55,7 @@ func (ns *NodeServer) NodePublishVolume(ctx context.Context, req *csi.NodePublis
 		return &csi.NodePublishVolumeResponse{}, nil
 	}
 
-	mnt := s3.NewRclone(req)
+	mnt := s3.NewMounter(req)
 	err = mnt.Mount(volumeId, target)
 	klog.V(4).Info("Rclone mount command execute finish!")
 	if err != nil {

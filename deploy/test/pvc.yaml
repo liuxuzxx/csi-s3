@@ -4,7 +4,7 @@ metadata:
   name: test-s3-minio
   namespace: minio
 spec:
-  storageClassName: minio-csi-s3-xw
+  storageClassName: mounter-bucket-xw-sc
   resources:
     requests:
       storage: 10Gi
