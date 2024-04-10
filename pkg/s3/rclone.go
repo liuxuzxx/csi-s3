@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	rcloneCommand         = "rclone"
-	defaultMountArguments = "--attr-timeout=5m --vfs-cache-mode=full --vfs-cache-max-age=24h --vfs-cache-max-size=10G --vfs-read-chunk-size-limit=100M --buffer-size=100M --file-perms=0777 --daemon"
+	rcloneCommand          = "rclone"
+	defaultRcloneArguments = "--attr-timeout=5m --vfs-cache-mode=full --vfs-cache-max-age=24h --vfs-cache-max-size=10G --vfs-read-chunk-size-limit=100M --buffer-size=100M --file-perms=0777 --daemon"
 )
 
 func NewRclone(req *csi.NodePublishVolumeRequest) *Rclone {
@@ -27,7 +27,7 @@ func NewRclone(req *csi.NodePublishVolumeRequest) *Rclone {
 	if v, ok := param[Arguments]; ok {
 		r.arguments = v
 	} else {
-		r.arguments = defaultMountArguments
+		r.arguments = defaultRcloneArguments
 	}
 	return r
 }

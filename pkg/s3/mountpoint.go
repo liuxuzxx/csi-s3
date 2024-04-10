@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	mountS3Command = "mount-s3"
+	mountS3Command          = "mount-s3"
+	defaultMountS3Arguments = "--allow-delete"
 )
 
 // 采用Aws开发的一个mountpoint-s3的挂载服务，因为是采用Rust编写的，所以感觉要比golang编写的rclone要性能高
@@ -27,16 +28,24 @@ type MountpointS3 struct {
 	endpoint  string
 	accessKey string
 	secretKey string
+	arguments string
 }
 
 func NewMountpointS3(req *csi.NodePublishVolumeRequest) *MountpointS3 {
 	param := req.GetVolumeContext()
-	return &MountpointS3{
+	m := &MountpointS3{
 		bucket:    param[Bucket],
 		endpoint:  param[Endpoint],
 		accessKey: param[AccessKey],
 		secretKey: param[SecretKey],
 	}
+
+	if v, ok := param[Arguments]; ok {
+		m.arguments = v
+	} else {
+		m.arguments = defaultMountS3Arguments
+	}
+	return m
 }
 
 func (m *MountpointS3) endpointUrl() string {
@@ -58,13 +67,17 @@ func (m *MountpointS3) Unstage(path string) error {
 
 func (m *MountpointS3) Mount(source string, target string) error {
 	url := m.endpointUrl()
+
+	cas := strings.Split(m.arguments, " ")
 	args := []string{
 		"--endpoint-url=" + url,
-		"--allow-delete",
 		m.bucket,
 		"--prefix=" + source + "/",
 		target,
 	}
+
+	//这个是根据mount-s3的命令格式来的: mount-s3 [OPTIONS] <BUCKET_NAME> <DIRECTORY>
+	args = append(cas, args...)
 
 	cmd := exec.Command(mountS3Command, args...)
 	envs := []string{
