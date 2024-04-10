@@ -1,5 +1,5 @@
 #!/bin/bash
-tag="release-v1.3.0.3"
+tag="v1.3.0"
 
 go build
 
