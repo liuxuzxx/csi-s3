@@ -4,10 +4,15 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 )
 
 func TestUseRcloneMountMinio(t *testing.T) {
+
+	argument := "--attr-timeout=5m --vfs-cache-mode=full --vfs-cache-max-age=24h --vfs-cache-max-size=10G --vfs-read-chunk-size-limit=100M --buffer-size=100M --file-perms=0777 --daemon"
+
+	cas := strings.Split(argument, " ")
 
 	envs := []string{
 		"AWS_ACCESS_KEY_ID=admin",
@@ -20,9 +25,9 @@ func TestUseRcloneMountMinio(t *testing.T) {
 		"/media/liuxu/data/temp/data/minio",
 		"--config=/media/liuxu/data/temp/data/rclone.conf",
 		"--s3-endpoint=http://10.20.121.41:30629",
-		"--attr-timeout=5m",
-		"--vfs-cache-mode=full --vfs-cache-max-age 24h --vfs-cache-max-size 10G --vfs-read-chunk-size-limit 100M --buffer-size 100M --file-perms 0777 --daemon",
 	}
+
+	args = append(args, cas...)
 
 	cmd := exec.Command("rclone", args...)
 	cmd.Stderr = os.Stderr
