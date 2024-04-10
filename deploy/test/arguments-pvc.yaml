@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: arguments-pvc
+  namespace: minio
+spec:
+  storageClassName: mount-arguement-bucket-xw-sc
+  resources:
+    requests:
+      storage: 15Gi
+  accessModes:
+    - ReadWriteOnce
