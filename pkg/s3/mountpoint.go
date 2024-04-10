@@ -44,7 +44,7 @@ func NewMountpointS3(req *csi.NodePublishVolumeRequest) *MountpointS3 {
 		m.arguments = v
 	} else {
 		m.arguments = defaultMountS3Arguments
-		klog.V(4).Info("The config arguments is empty ,so we use default arguments:%s", defaultMountS3Arguments)
+		klog.V(4).Infof("The config arguments is empty ,so we use default arguments:%s", defaultMountS3Arguments)
 	}
 	return m
 }

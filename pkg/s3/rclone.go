@@ -28,7 +28,7 @@ func NewRclone(req *csi.NodePublishVolumeRequest) *Rclone {
 		r.arguments = v
 	} else {
 		r.arguments = defaultRcloneArguments
-		klog.V(4).Info("The config arguments is empty, so we use default arguments:%s", defaultRcloneArguments)
+		klog.V(4).Infof("The config arguments is empty, so we use default arguments:%s", defaultRcloneArguments)
 	}
 	return r
 }
