@@ -7,7 +7,7 @@ parameters:
   #目前支持两种类型: rclone,mountpoint-s3
   mounter: rclone
   #挂载参数，每个StorageClass自定义，灵活性
-  argument: 
+  arguments: "--attr-timeout=5m --vfs-cache-mode=full --vfs-cache-max-age=24h --vfs-cache-max-size=10G --vfs-read-chunk-size-limit=100M --buffer-size=100M --file-perms=0777 --daemon"
   bucket: mounter-bucket-sc-dev
   access-key: {{ .Values.minio.accessKey }}
   secret-key: {{ .Values.minio.accessSecret }}
