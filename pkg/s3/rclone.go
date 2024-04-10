@@ -11,17 +11,26 @@ import (
 )
 
 const (
-	rcloneCommand = "rclone"
+	rcloneCommand          = "rclone"
+	defaultRcloneArguments = "--attr-timeout=5m --vfs-cache-mode=full --vfs-cache-max-age=24h --vfs-cache-max-size=10G --vfs-read-chunk-size-limit=100M --buffer-size=100M --file-perms=0777 --daemon"
 )
 
 func NewRclone(req *csi.NodePublishVolumeRequest) *Rclone {
 	param := req.GetVolumeContext()
-	return &Rclone{
+	r := &Rclone{
 		bucket:    param[Bucket],
 		endpoint:  param[Endpoint],
 		accessKey: param[AccessKey],
 		secretKey: param[SecretKey],
 	}
+
+	if v, ok := param[Arguments]; ok {
+		r.arguments = v
+	} else {
+		r.arguments = defaultRcloneArguments
+		klog.V(4).Infof("The config arguments is empty, so we use default arguments:%s", defaultRcloneArguments)
+	}
+	return r
 }
 
 type Rclone struct {
@@ -29,6 +38,7 @@ type Rclone struct {
 	endpoint  string
 	accessKey string
 	secretKey string
+	arguments string
 }
 
 func (r *Rclone) Stage(path string) error {
@@ -44,20 +54,16 @@ func (r *Rclone) Unstage(path string) error {
 func (r *Rclone) Mount(source string, target string) error {
 	url := r.endpointUrl()
 
+	cas := strings.Split(r.arguments, " ")
+
 	args := []string{
 		"mount",
 		"minio:/" + r.bucket + "/" + source,
 		target,
 		"--config=/home/csi/rclone.conf",
 		"--s3-endpoint=" + url,
-		"--attr-timeout=5m",
-		"--vfs-cache-mode=full",
-		"--vfs-cache-max-age=24h",
-		"--vfs-cache-max-size=10G",
-		"--vfs-read-chunk-size-limit=100M",
-		"--buffer-size=100M",
-		"--daemon",
 	}
+	args = append(args, cas...)
 	envs := []string{
 		"AWS_ACCESS_KEY_ID=" + r.accessKey,
 		"AWS_SECRET_ACCESS_KEY=" + r.secretKey,

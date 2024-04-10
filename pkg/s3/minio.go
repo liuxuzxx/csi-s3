@@ -12,6 +12,7 @@ import (
 
 const (
 	MounterType string = "mounter"
+	Arguments   string = "arguments"
 	Bucket      string = "bucket"
 	AccessKey   string = "access-key"
 	SecretKey   string = "secret-key"
