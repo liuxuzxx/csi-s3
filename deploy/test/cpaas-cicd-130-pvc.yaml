@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-cpaas-130-pvc
+  namespace: cpaas-cicd
+spec:
+  storageClassName: minio-csi-s3-xw-130
+  resources:
+    requests:
+      storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
