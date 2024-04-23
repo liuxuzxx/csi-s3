@@ -79,6 +79,11 @@ func (ns *NodeServer) NodeUnpublishVolume(ctx context.Context, req *csi.NodeUnpu
 		return nil, status.Error(codes.InvalidArgument, "NodeUnpublishVolume:Target Path is missing in request")
 	}
 
+	if err := s3.FuseUnmount(targetPath); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	klog.V(4).Infof("s3:volume %s has been unmounted.", volumeId)
+
 	return &csi.NodeUnpublishVolumeResponse{}, nil
 }
 
