@@ -85,3 +85,36 @@ bash build-nopush.sh
 cd ./deploy/s3-csi
 helm install csi-s3 ./ -n namespace(自定义)
 ```
+
+# 版本功能计划
+
+## v1.4.0
+1. 修复监听umount事件,当运行一段时间后，发现如下的场景
+```bash
+PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                                                                                                                     
+998 root      20   0 1290216  76812  39040 S   7.6   0.1   0:02.47 rclone                                                                                                                                      
+983 root      20   0 1289704  63384  38656 S   1.3   0.1   0:00.70 rclone                                                                                                                                      
+1 root      20   0 2200952  25660  12032 S   0.0   0.0   0:02.51 s3csi                                                                                                                                       
+38 root      20   0       0      0      0 Z   0.0   0.0   0:17.22 rclone                                                                                                                                      
+79 root      20   0 1290728  79052  41216 S   0.0   0.1   0:05.75 rclone                                                                                                                                      
+116 root      20   0       0      0      0 Z   0.0   0.0   0:14.53 rclone                                                                                                                                      
+173 root      20   0       0      0      0 Z   0.0   0.0   0:28.67 rclone                                                                                                                                      
+220 root      20   0       0      0      0 Z   0.0   0.0   0:11.42 rclone                                                                                                                                      
+261 root      20   0       0      0      0 Z   0.0   0.0   0:10.74 rclone                                                                                                                                      
+315 root      20   0       0      0      0 Z   0.0   0.0   0:38.89 rclone                                                                                                                                      
+357 root      20   0 1291112  83376  40960 S   0.0   0.1   0:07.49 rclone                                                                                                                                      
+407 root      20   0 1291176  82480  40960 S   0.0   0.1   0:05.95 rclone                                                                                                                                      
+504 root      20   0       0      0      0 Z   0.0   0.0   0:18.58 rclone                                                                                                                                      
+551 root      20   0       0      0      0 Z   0.0   0.0   0:07.68 rclone                                                                                                                                      
+594 root      20   0 1291432  82124  40832 S   0.0   0.1   0:05.39 rclone                                                                                                                                      
+636 root      20   0       0      0      0 Z   0.0   0.0   0:12.27 rclone                                                                                                                                      
+681 root      20   0       0      0      0 Z   0.0   0.0   0:09.34 rclone                                                                                                                                      
+729 root      20   0       0      0      0 Z   0.0   0.0   0:10.71 rclone                                                                                                                                      
+779 root      20   0       0      0      0 Z   0.0   0.0   0:08.45 rclone                                                                                                                                      
+825 root      20   0       0      0      0 Z   0.0   0.0   0:05.69 rclone                                                                                                                                      
+868 root      20   0       0      0      0 Z   0.0   0.0   0:05.94 rclone                                                                                                                                      
+958 root      20   0 1290856  74544  40320 S   0.0   0.1   0:05.21 rclone                                                                                                                                      
+1025 root      20   0    2776   1536   1536 S   0.0   0.0   0:00.00 sh                                                                                                                                          
+1031 root      20   0    8788   4864   2816 R   0.0   0.0   0:00.01 top 
+```
+看到的情况是：很多的rclone进程，问题产生的原因是：没有监听处理umount事件，导致很多的rclone的daemon程序，占据很多内存，出现错误
