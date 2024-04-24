@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/container-storage-interface/spec/lib/go/csi"
-	"github.com/golang/glog"
 	ps "github.com/mitchellh/go-ps"
 	"k8s.io/klog"
 	"k8s.io/mount-utils"
@@ -71,25 +70,25 @@ func FuseUnmount(path string) error {
 
 func waitForProcess(p *os.Process, backoff int) error {
 	if backoff == 20 {
-		return fmt.Errorf("Timeout waiting for PID %v to end", p.Pid)
+		return fmt.Errorf("timeout waiting for PID %v to end", p.Pid)
 	}
 	cmdLine, err := getCmdLine(p.Pid)
 	if err != nil {
-		glog.Warningf("Error checking cmdline of PID %v, assuming it is dead: %s", p.Pid, err)
+		klog.V(4).Infof("Error checking cmdline of PID %v, assuming it is dead: %s", p.Pid, err)
 		return nil
 	}
 	if cmdLine == "" {
 		// ignore defunct processes
 		// TODO: debug why this happens in the first place
 		// seems to only happen on k8s, not on local docker
-		glog.Warning("Fuse process seems dead, returning")
+		klog.V(4).Info("Fuse process seems dead, returning")
 		return nil
 	}
 	if err := p.Signal(syscall.Signal(0)); err != nil {
-		glog.Warningf("Fuse process does not seem active or we are unprivileged: %s", err)
+		klog.V(4).Infof("Fuse process does not seem active or we are unprivileged: %s", err)
 		return nil
 	}
-	glog.Infof("Fuse process with PID %v still active, waiting...", p.Pid)
+	klog.V(4).Infof("Fuse process with PID %v still active, waiting...", p.Pid)
 	time.Sleep(time.Duration(backoff*100) * time.Millisecond)
 	return waitForProcess(p, backoff+1)
 }
