@@ -21,6 +21,7 @@ const (
 	//定义Mounter挂载器类型
 	RcloneMounter       = "rclone"
 	MountpointS3Mounter = "mountpoint-s3"
+	S3fsMounter         = "s3fs"
 )
 
 // 定义Mounter接口，定义好对接S3的挂载的接口
@@ -43,6 +44,8 @@ func NewMounter(req *csi.NodePublishVolumeRequest) Mounter {
 		return NewRclone(req)
 	case MountpointS3Mounter:
 		return NewMountpointS3(req)
+	case S3fsMounter:
+		return NewS3fs(req)
 	default:
 		return NewRclone(req)
 	}
