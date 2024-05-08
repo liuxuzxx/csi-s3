@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y /tmp/mount-s3.deb && apt-get install -y
 COPY ./rclone.conf /home/csi/
 COPY ./rclone /usr/bin/
 RUN chmod 755 /usr/bin/rclone
+RUN apt install -y s3fs
 
 WORKDIR /home/csi/
 
