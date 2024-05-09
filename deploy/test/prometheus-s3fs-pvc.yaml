@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: minio-cpaas-pvc
-  namespace: cpaas-cicd
+  name: prometheus-s3fs-130-pvc
+  namespace: monitoring
 spec:
-  storageClassName: minio-csi-s3-xw
+  storageClassName: minio-s3fs-sc
   resources:
     requests:
-      storage: 100Gi
+      storage: 200Gi
   accessModes:
     - ReadWriteOnce

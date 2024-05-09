@@ -65,7 +65,7 @@ func (s *S3fs) Mount(source string, target string) error {
 	url := s.endpointUrl()
 	cas := strings.Split(s.arguments, " ")
 	args := []string{
-		strings.Join([]string{s.bucket, source}, "/"),
+		strings.Join([]string{s.bucket, source}, ":/"),
 		target,
 		"-o",
 		"url=" + url,

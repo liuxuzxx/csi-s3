@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: arguments-pvc
-  namespace: minio
+  name: grafana-s3fs-130-pvc
+  namespace: monitoring
 spec:
-  storageClassName: mount-arguement-bucket-xw-sc
+  storageClassName: minio-s3fs-sc
   resources:
     requests:
-      storage: 15Gi
+      storage: 10Gi
   accessModes:
     - ReadWriteOnce
