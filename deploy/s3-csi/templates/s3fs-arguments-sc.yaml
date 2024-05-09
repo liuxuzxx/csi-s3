@@ -1,12 +1,11 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: minio-csi-s3-xw
+  name: minio-s3fs-sc
 provisioner: minio.s3.csi.xw.com
 parameters:
-  #目前支持两种类型: rclone,mountpoint-s3
-  mounter: mount-s3
-  bucket: {{ .Values.minio.bucket }}
+  mounter: s3fs
+  bucket: k8s-dev-sc-130
   access-key: {{ .Values.minio.accessKey }}
   secret-key: {{ .Values.minio.accessSecret }}
   endpoint: {{ .Values.minio.url }}

@@ -64,8 +64,25 @@ func (ns *NodeServer) NodePublishVolume(ctx context.Context, req *csi.NodePublis
 	return &csi.NodePublishVolumeResponse{}, nil
 }
 
+// 需要处理这个事件，然后在这个回调方法中调用umount的操作，避免过多的rclone和过多的mount一直不能被释放
+// todo
 func (ns *NodeServer) NodeUnpublishVolume(ctx context.Context, req *csi.NodeUnpublishVolumeRequest) (*csi.NodeUnpublishVolumeResponse, error) {
 	klog.V(4).Infof("NodeUnpublishVolume: called with args %+v", *req)
+
+	volumeId := req.GetVolumeId()
+	targetPath := req.GetTargetPath()
+
+	if len(volumeId) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "NodeUnpublishVolume:Volume ID is missing in request")
+	}
+	if len(targetPath) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "NodeUnpublishVolume:Target Path is missing in request")
+	}
+
+	if err := s3.FuseUnmount(targetPath); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	klog.V(4).Infof("s3:volume %s has been unmounted.", volumeId)
 
 	return &csi.NodeUnpublishVolumeResponse{}, nil
 }

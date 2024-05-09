@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: test-s3-minio
-  namespace: minio
+  name: minio-s3fs-130-pvc
+  namespace: cpaas-cicd
 spec:
-  storageClassName: mounter-bucket-xw-sc
+  storageClassName: minio-s3fs-sc
   resources:
     requests:
-      storage: 10Gi
+      storage: 100Gi
   accessModes:
     - ReadWriteOnce

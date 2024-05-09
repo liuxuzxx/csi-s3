@@ -42,7 +42,7 @@ type Rclone struct {
 }
 
 func (r *Rclone) Stage(path string) error {
-	klog.V(4).Info("Rclone State method not implements")
+	klog.V(4).Info("Rclone Stage method not implements")
 	return nil
 }
 
@@ -65,8 +65,8 @@ func (r *Rclone) Mount(source string, target string) error {
 	}
 	args = append(args, cas...)
 	envs := []string{
-		"AWS_ACCESS_KEY_ID=" + r.accessKey,
-		"AWS_SECRET_ACCESS_KEY=" + r.secretKey,
+		AwsAccessKeyId + "=" + r.accessKey,
+		AwsSecretAccessKey + "=" + r.secretKey,
 	}
 	cmd := exec.Command(rcloneCommand, args...)
 	cmd.Stderr = os.Stderr
