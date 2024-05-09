@@ -23,14 +23,15 @@ The Mountpoint for S3 Container Storage Interface (CSI) Driver allows your Kuber
 ## Container Images
 | Driver Version | Image(Docker hub)|
 |----------------|------------------|
-| v1.3.0         | liuxuzxx/csi-s3:v1.3.0|
+| v1.4.0         | liuxuzxx/csi-s3:v1.4.0|
 
 <summary>Previous Images</summary>
 
 | Driver Version | Image(Docker hub) |
 |----------------|-------------------|
-| v1.2.0         | liuxuzxx/csi/s3:v1.2.0|
-| v1.1.0         | liuxuzxx/csi/s3:v1.1.0|
+| v1.3.0         | liuxuzxx/csi-s3:v1.3.0|
+| v1.2.0         | liuxuzxx/csi-s3:v1.2.0|
+| v1.1.0         | liuxuzxx/csi-s3:v1.1.0|
 
 ## Install
 
