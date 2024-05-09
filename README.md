@@ -19,6 +19,7 @@ The Mountpoint for S3 Container Storage Interface (CSI) Driver allows your Kuber
 
 * **rclone** -  [Rclone Github Link](https://github.com/rclone/rclone.git)
 * **mountpoint-s3** [mountpoint-s3 Github Link](https://github.com/awslabs/mountpoint-s3-csi-driver.git)
+* **s3fs** [s3fs Github Link](https://github.com/s3fs-fuse/s3fs-fuse.git)
 
 ## Container Images
 | Driver Version | Image(Docker hub)|
