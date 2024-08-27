@@ -1,7 +1,11 @@
 global:
-  image: xwharbor.wxchina.com/cpaas-dev/component/csi-s3
-  tag: release-v1.5.0.2
+  #按照自己的情况配置镜像地址信息
+  csiS3Image: liuxuzxx/csi-s3:v1.4.0
+  livenessprobeImage: liuxuzxx/livenessprobe:v2.12.0
+  csiProvisioner: liuxuzxx/csi-provisioner:v4.0.0
+  csiNodeDriverRegistrar: liuxuzxx/csi-node-driver-registrar:v2.10.0
 
+#按照自己的情况配置minio的信息
 minio:
   url: 10.20.121.130:9000
   accessKey: admin
