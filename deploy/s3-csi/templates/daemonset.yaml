@@ -19,7 +19,7 @@ spec:
         - operator: Exists
       containers:
         - name: s3-plugin
-          image: {{ .Values.global.image }}:{{ .Values.global.tag }}
+          image: {{ .Values.global.csiS3Image }}
           args:
             - --endpoint=$(CSI_ENDPOINT)
             - --nodeId=$(NODE_NAME)
@@ -48,7 +48,7 @@ spec:
             - mountPath: /csi
               name: socket-dir
         - name: node-driver-registrar
-          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/csi-node-driver-registrar:v2.10.0
+          image: {{ .Values.global.csiNodeDriverRegistrar }}
           args:
             - --csi-address=$(ADDRESS)
             - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
@@ -64,7 +64,7 @@ spec:
             - mountPath: /registration
               name: registration-dir
         - name: liveness-probe
-          image: xwharbor.wxchina.com/cpaas-pub/sig-storage/livenessprobe:v2.12.0
+          image: {{ .Values.global.livenessprobeImage }}
           args:
             - --csi-address=/csi/csi.sock
             - --health-port=29653
