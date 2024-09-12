@@ -73,3 +73,12 @@ func (m *MinioClient) CreateDir(path string) error {
 	}
 	return nil
 }
+
+func (m *MinioClient) UploadFile(path string, data []byte) error {
+	_, err := m.client.PutObject(m.ctx, m.bucketName, path, bytes.NewReader(data), int64(len(data)), minio.PutObjectOptions{})
+	if err != nil {
+		klog.V(4).Infof("Upload file failed %s", err.Error())
+		return err
+	}
+	return nil
+}
