@@ -12,10 +12,10 @@ import (
 
 func TestMinioClient(t *testing.T) {
 	t.Log("连接到 MinIO 服务器")
-	endpoint := "172.16.84.26:9000"
+	endpoint := "minio-api.cpaas.wxchina.com:30669"
 	accessKeyID := "admin"
-	secretAccessKey := "password"
-	useSSL := true
+	secretAccessKey := "minioadmin"
+	useSSL := false
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{

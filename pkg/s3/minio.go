@@ -3,6 +3,8 @@ package s3
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"net/http"
 
 	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/minio/minio-go/v7"
@@ -18,9 +20,8 @@ const (
 	SecretKey   string = "secret-key"
 	Endpoint    string = "endpoint"
 	Version     string = `S3-Service: Minio
-						CSI: K8S
-						Company: Xuanwu Technolojy
-	`
+						CSI: K8S`
+	UseSSL string = "use-ssl"
 )
 
 // 增加Minio的操作封装对象，方便处理一些操作
@@ -41,15 +42,31 @@ func NewClient(req *csi.CreateVolumeRequest) *MinioClient {
 	sk := p[SecretKey]
 	ep := p[Endpoint]
 	bk := p[Bucket]
-	klog.V(4).Infof("Fetch s3 config:%s %s %s %s", ak, sk, ep, bk)
-	return NewMinioClient(ep, ak, sk, bk)
+
+	us, ok := p[UseSSL]
+
+	useSsl := false
+	if ok {
+		useSsl = (us == "true")
+	} else {
+		useSsl = true
+	}
+	klog.V(4).Infof("Fetch s3 config:%s %s %s %s %s", ak, sk, ep, bk, us)
+	return NewMinioClient(ep, ak, sk, bk, useSsl)
 }
 
-func NewMinioClient(endpoint string, accessKey string, secretAccessKey string, bucket string) *MinioClient {
+func NewMinioClient(endpoint string, accessKey string, secretAccessKey string, bucket string, useSsl bool) *MinioClient {
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
 
 	client, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKey, secretAccessKey, ""),
-		Secure: false,
+		Creds:     credentials.NewStaticV4(accessKey, secretAccessKey, ""),
+		Secure:    useSsl,
+		Transport: tr,
 	})
 	if err != nil {
 		klog.V(4).Infof(err.Error())
