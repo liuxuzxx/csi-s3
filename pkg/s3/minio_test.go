@@ -2,8 +2,6 @@ package s3
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"testing"
 
 	"github.com/minio/minio-go/v7"
@@ -11,9 +9,10 @@ import (
 )
 
 func TestMinioClient(t *testing.T) {
-	endpoint := "cpaas-minio.minio:9000"
+	t.Log("连接到 MinIO 服务器")
+	endpoint := "172.16.84.26:9000"
 	accessKeyID := "admin"
-	secretAccessKey := "minioadmin"
+	secretAccessKey := "passwords"
 	useSSL := false
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
@@ -21,18 +20,18 @@ func TestMinioClient(t *testing.T) {
 		Secure: useSSL,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatalf("无法创建 MinIO 客户端: %v", err)
 	}
 
+	t.Log("成功创建 MinIO 客户端")
 	ctx := context.Background()
 	buckets, err := minioClient.ListBuckets(ctx)
 	if err != nil {
-		fmt.Println("ListBuckets Error!")
-		log.Fatalln(err)
-	}
-	fmt.Println("Print Buckets!")
-	for _, bucket := range buckets {
-		fmt.Println(bucket.Name)
+		t.Fatalf("无法列出存储桶: %v", err)
 	}
 
+	t.Log("列出存储桶:")
+	for _, bucket := range buckets {
+		t.Logf("存储桶名称: %s", bucket.Name)
+	}
 }
