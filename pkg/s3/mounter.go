@@ -81,9 +81,6 @@ func waitForProcess(p *os.Process, backoff int) error {
 		return nil
 	}
 	if cmdLine == "" {
-		// ignore defunct processes
-		// TODO: debug why this happens in the first place
-		// seems to only happen on k8s, not on local docker
 		klog.V(4).Info("Fuse process seems dead, returning")
 		return nil
 	}

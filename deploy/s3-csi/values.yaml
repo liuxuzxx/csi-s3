@@ -1,9 +1,8 @@
 global:
-  #按照自己的情况配置镜像地址信息
-  csiS3Image: liuxuzxx/csi-s3:v1.4.0
-  livenessprobeImage: liuxuzxx/livenessprobe:v2.12.0
-  csiProvisioner: liuxuzxx/csi-provisioner:v4.0.0
-  csiNodeDriverRegistrar: liuxuzxx/csi-node-driver-registrar:v2.10.0
+  csiS3Image: xwharbor.wxchina.com/cpaas-dev/csi-s3:v1.5.0-003ee10d39f175167da71a0c23af125f81569bd7
+  livenessprobeImage: xwharbor.wxchina.com/cpaas-pub/livenessprobe:v2.12.0
+  csiProvisioner: xwharbor.wxchina.com/cpaas-pub/sig-storage/csi-provisioner:v4.0.0
+  csiNodeDriverRegistrar: xwharbor.wxchina.com/cpaas-pub/csi-node-driver-registrar:v2.10.0
 
 #按照自己的情况配置minio的信息
 minio:

@@ -1,53 +1,56 @@
-# S3 CSI Driver (Minio/Huawei cloud OBS/Amazon S3)
+# 1. S3 CSI Driver (Minio/Huawei cloud OBS/Amazon S3)
 
-## Overview
+## 1.1 Overview
+
 The Mountpoint for S3 Container Storage Interface (CSI) Driver allows your Kubernetes applications to access S3 objects through a file system interface.
 
-## Fatures
-* **Static Provisioning** - Associate an existing S3 bucket with a [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) (PV) for consumption within Kubernetes.
-* **Mount Options** - Mount options can be specified in the PersistentVolume (PV) resource to define how the volume should be mounted. For Mountpoint-specific options
+## 1.2 Fatures
 
-## Support S3 Server
+- **Static Provisioning** - Associate an existing S3 bucket with a [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) (PV) for consumption within Kubernetes.
+- **Mount Options** - Mount options can be specified in the PersistentVolume (PV) resource to define how the volume should be mounted. For Mountpoint-specific options
 
-|S3 Server Type|Supported|Remark|
-|:--:|:--:|:--:|
-|MinIO|Yes|No|
-|Huawei Cloud OBS|Yes|No|
-|Amazon S3|Yes|No|
+## 1.3 Support S3 Server
 
-## Support Mounter type
+|  S3 Server Type  | Supported | Remark |
+| :--------------: | :-------: | :----: |
+|      MinIO       |    Yes    |   No   |
+| Huawei Cloud OBS |    Yes    |   No   |
+|    Amazon S3     |    Yes    |   No   |
 
-* **rclone** -  [Rclone Github Link](https://github.com/rclone/rclone.git)
-* **mountpoint-s3** [mountpoint-s3 Github Link](https://github.com/awslabs/mountpoint-s3-csi-driver.git)
-* **s3fs** [s3fs Github Link](https://github.com/s3fs-fuse/s3fs-fuse.git)
+## 1.4 Support Mounter type
 
-## Container Images
-| Driver Version | Image(Docker hub)|
-|----------------|------------------|
-| v1.4.0         | liuxuzxx/csi-s3:v1.4.0|
+- **rclone** - [Rclone Github Link](https://github.com/rclone/rclone.git)
+- **mountpoint-s3** [mountpoint-s3 Github Link](https://github.com/awslabs/mountpoint-s3-csi-driver.git)
+- **s3fs** [s3fs Github Link](https://github.com/s3fs-fuse/s3fs-fuse.git)
+
+## 1.5 Container Images
+
+| Driver Version | Image(Docker hub)      |
+| -------------- | ---------------------- |
+| v1.4.0         | liuxuzxx/csi-s3:v1.4.0 |
 
 <summary>Previous Images</summary>
 
-| Driver Version | Image(Docker hub) |
-|----------------|-------------------|
-| v1.3.0         | liuxuzxx/csi-s3:v1.3.0|
-| v1.2.0         | liuxuzxx/csi-s3:v1.2.0|
-| v1.1.0         | liuxuzxx/csi-s3:v1.1.0|
+| Driver Version | Image(Docker hub)      |
+| -------------- | ---------------------- |
+| v1.3.0         | liuxuzxx/csi-s3:v1.3.0 |
+| v1.2.0         | liuxuzxx/csi-s3:v1.2.0 |
+| v1.1.0         | liuxuzxx/csi-s3:v1.1.0 |
 
-## Install
+## 1.6 Install
 
 We support install use Helm
 
 1. [Install Helm](https://helm.sh/docs/intro/install/)
 2. Install csi-s3
+
 ```bash
 linux> git clone https://github.com/liuxuzxx/csi-s3.git
 linux> cd csi-s3/deploy/s3-csi
 linux> helm install csi-s3 ./ -n xxx
 ```
 
-
-## Self Build
+## 1.7 Self Build
 
 ```bash
 linux> git clone https://github.com/liuxuzxx/csi-s3.git
@@ -60,63 +63,91 @@ linux> bash build-nopush.sh
 linux> go build
 ```
 
+# 2. 概述
 
-# 概述
-支持S3协议的K8S的CSI插件实现
+支持 S3 协议的 K8S 的 CSI 插件实现
 
-# 备注
-由于使用的是MinIO作为存储，替换掉了NFS，但是从往上找到的一些生成支持S3协议的CSI实现，安装上去之后多多少少都是会出现一些问题，包括如下的：
+# 3. 备注
+
+由于使用的是 MinIO 作为存储，替换掉了 NFS，但是从往上找到的一些生成支持 S3 协议的 CSI 实现，安装上去之后多多少少都是会出现一些问题，包括如下的：
 https://github.com/yandex-cloud/k8s-csi-s3.git
 https://github.com/ctrox/csi-s3.git
 
-安装之后各种奇奇怪怪的问题，并且发现作者并没有去关心这些issule，所以为了快速投产，所以也就没有那么多的耐心进行等待了，直接自己开发一个CSI的实现得了
+安装之后各种奇奇怪怪的问题，并且发现作者并没有去关心这些 issule，所以为了快速投产，所以也就没有那么多的耐心进行等待了，直接自己开发一个 CSI 的实现得了
 
-# CSI的流程
-1.当我们执行PVC的创建的时候，K8S会调用CSI插件(使用driver的名字来区分)的Controller服务的CreateVolume接口，创建Volume(这个时候只是创建了一个Volume对象，然后记录给了K8S).  Volume的创建
-2.Volume的使用:当我们使用一个Pod当中的某个容器执行volumeMounts的时候，会调用CSI插件的ControllerPublishVolume接口，将这个存储见挂载到某个主机上
+# 4. CSI 的流程
 
-# 打包流程
-1. git clone 仓库的git地址
+1.当我们执行 PVC 的创建的时候，K8S 会调用 CSI 插件(使用 driver 的名字来区分)的 Controller 服务的 CreateVolume 接口，创建 Volume(这个时候只是创建了一个 Volume 对象，然后记录给了 K8S). Volume 的创建
+2.Volume 的使用:当我们使用一个 Pod 当中的某个容器执行 volumeMounts 的时候，会调用 CSI 插件的 ControllerPublishVolume 接口，将这个存储见挂载到某个主机上
+
+# 5. 打包流程
+
+1. git clone 仓库的 git 地址
 2. 打包并且构建镜像并推送
+
 ```bash
 cd ./cmd/s3csi
 bash build-nopush.sh
 ```
+
 3.执行安装
+
 ```bash
 cd ./deploy/s3-csi
 helm install csi-s3 ./ -n namespace(自定义)
 ```
 
-# 版本功能计划
+# 6. 其他工具使用
 
-## v1.4.0
-1. 修复监听umount事件,当运行一段时间后，发现如下的场景
+## 6.1 Rclone 的使用
+
+### 6.1.1 Rclone 的基本介绍
+
+> Rclone 是一个 rsync 的云存储版本.
+> 官方说法: "rsync for cloud storage" - Google Drive, S3, Dropbox, Backblaze B2, One Drive, Swift, Hubic, Wasabi, Google Cloud Storage, Azure Blob, Azure Files, Yandex Files
+
+> 我们主要是使用 Rclone 挂载 minio 到本地，查看 mount 的一些操作和性能
+
+### 6.1.2 Rclone 执行挂载 minio 的操作
+
 ```bash
-PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                                                                                                                     
-998 root      20   0 1290216  76812  39040 S   7.6   0.1   0:02.47 rclone                                                                                                                                      
-983 root      20   0 1289704  63384  38656 S   1.3   0.1   0:00.70 rclone                                                                                                                                      
-1 root      20   0 2200952  25660  12032 S   0.0   0.0   0:02.51 s3csi                                                                                                                                       
-38 root      20   0       0      0      0 Z   0.0   0.0   0:17.22 rclone                                                                                                                                      
-79 root      20   0 1290728  79052  41216 S   0.0   0.1   0:05.75 rclone                                                                                                                                      
-116 root      20   0       0      0      0 Z   0.0   0.0   0:14.53 rclone                                                                                                                                      
-173 root      20   0       0      0      0 Z   0.0   0.0   0:28.67 rclone                                                                                                                                      
-220 root      20   0       0      0      0 Z   0.0   0.0   0:11.42 rclone                                                                                                                                      
-261 root      20   0       0      0      0 Z   0.0   0.0   0:10.74 rclone                                                                                                                                      
-315 root      20   0       0      0      0 Z   0.0   0.0   0:38.89 rclone                                                                                                                                      
-357 root      20   0 1291112  83376  40960 S   0.0   0.1   0:07.49 rclone                                                                                                                                      
-407 root      20   0 1291176  82480  40960 S   0.0   0.1   0:05.95 rclone                                                                                                                                      
-504 root      20   0       0      0      0 Z   0.0   0.0   0:18.58 rclone                                                                                                                                      
-551 root      20   0       0      0      0 Z   0.0   0.0   0:07.68 rclone                                                                                                                                      
-594 root      20   0 1291432  82124  40832 S   0.0   0.1   0:05.39 rclone                                                                                                                                      
-636 root      20   0       0      0      0 Z   0.0   0.0   0:12.27 rclone                                                                                                                                      
-681 root      20   0       0      0      0 Z   0.0   0.0   0:09.34 rclone                                                                                                                                      
-729 root      20   0       0      0      0 Z   0.0   0.0   0:10.71 rclone                                                                                                                                      
-779 root      20   0       0      0      0 Z   0.0   0.0   0:08.45 rclone                                                                                                                                      
-825 root      20   0       0      0      0 Z   0.0   0.0   0:05.69 rclone                                                                                                                                      
-868 root      20   0       0      0      0 Z   0.0   0.0   0:05.94 rclone                                                                                                                                      
-958 root      20   0 1290856  74544  40320 S   0.0   0.1   0:05.21 rclone                                                                                                                                      
-1025 root      20   0    2776   1536   1536 S   0.0   0.0   0:00.00 sh                                                                                                                                          
-1031 root      20   0    8788   4864   2816 R   0.0   0.0   0:00.01 top 
+#在这个之前请先去Rclone官网下载对应操作系统的rclone程序，自己安装
+
 ```
-看到的情况是：很多的rclone进程，问题产生的原因是：没有监听处理umount事件，导致很多的rclone的daemon程序，占据很多内存，出现错误
+
+## 6.2 Minio 的基本使用
+
+### 6.2.1 提供 HTTPS 的 minio 服务
+
+1. 首先是去 minio 的官方网站查找对应的程序包
+
+```bash
+https://min.io/open-source/download?platform=linux
+```
+
+2. 提供执行程序
+
+```bash
+#!/bin/sh
+
+export MINIO_ROOT_USER=admin #设置默认ROOT级别的用户名
+export MINIO_ROOT_PASSWORD=password  #设置默认的ROOT级别的密码
+
+#./minio server 本地路径 --console-address ":9001" 使用9001作为控制台的web的端口
+nohup ./minio server /media/liuxu/data/component/minio/data --console-address ":9001" > nohup.log 2>&1 &
+```
+
+3. 提供 https 访问服务
+
+```bash
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./private.key -out ./public.crt
+```
+
+4. 把生成的 private.key 和 public.crt 复制到如下目录
+
+```bash
+mv ./private.key ~/.minio/certs/
+mv ./public.crt ~/.minio/certs/
+```
+
+5. 重启 minio 服务即可

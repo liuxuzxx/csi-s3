@@ -1,4 +1,4 @@
-FROM xwharbor.wxchina.com/cpaas-dev/ubuntu:23.10
+FROM xwharbor.wxchina.com/cpaas/component/ubuntu:24.04
 LABEL maintainers="lx"
 LABEL description="MinIO S3 CSI Driver"
 

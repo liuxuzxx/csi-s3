@@ -2,6 +2,8 @@ package s3
 
 import (
 	"context"
+	"crypto/tls"
+	"net/http"
 	"testing"
 
 	"github.com/minio/minio-go/v7"
@@ -12,12 +14,19 @@ func TestMinioClient(t *testing.T) {
 	t.Log("连接到 MinIO 服务器")
 	endpoint := "172.16.84.26:9000"
 	accessKeyID := "admin"
-	secretAccessKey := "passwords"
-	useSSL := false
+	secretAccessKey := "password"
+	useSSL := true
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
+		Creds:     credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+		Secure:    useSSL,
+		Transport: tr,
 	})
 	if err != nil {
 		t.Fatalf("无法创建 MinIO 客户端: %v", err)
